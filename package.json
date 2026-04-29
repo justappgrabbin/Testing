@@ -1,0 +1,28 @@
+{
+  "name": "morph-full-unified",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Morph OS full unified release: standalone browser MIR, Node kernel, CLI, admin bridge, and Trident Expo app.",
+  "type": "commonjs",
+  "scripts": {
+    "init": "node morph-cli.js init",
+    "test": "node morph-cli.js test",
+    "smoke": "node scripts/smoke-test.js",
+    "dev": "npm run init && npm run test",
+    "cli:init": "node morph-cli.js init",
+    "cli:test": "node morph-cli.js test",
+    "cli:pipeline": "node morph-cli.js pipeline samples/legacy.js --mode improved",
+    "kernel:boot": "node morph-os-kernel.js",
+    "admin:check": "cd bridge/admin && npm run init",
+    "admin:install": "cd bridge/admin && npm install",
+    "admin:start": "cd bridge/admin && npm start",
+    "expo:install": "cd apps/TridentApp-Expo && npm install",
+    "expo:start": "cd apps/TridentApp-Expo && npx expo start"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "morph": "./morph-cli.js"
+  }
+}
