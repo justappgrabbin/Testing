@@ -1,61 +1,89 @@
-# Morph OS · Coherent Unified Release
+# ⬡ Trident — Self-Building GNN App (Expo / React Native)
 
-This package has one canonical runtime core and multiple entry points:
+A mobile-first app with a Graph Neural Network that learns, grows, and persists across sessions.
+Generate apps/games/agents via AI, pick and extract ZIPs, paste code to run instantly.
 
-- **Canonical kernel:** `kernel/*`
-- **CLI:** `morph-cli.js` -> `cli/morph-cli.js`
-- **Browser:** `index.html` / `browser/morph-system.html`
-- **Admin bridge:** `bridge/admin`, consuming `../../kernel`
-- **Expo app:** `apps/TridentApp-Expo`
+---
 
-## Quick verification
+## Quick Start
 
 ```bash
-npm run smoke
+# 1. Install deps
+npm install
+
+# 2. Start Expo
+npx expo start
+
+# 3. Open on device
+#    → Scan QR with Expo Go (iOS/Android)
+#    → Press 'i' for iOS Simulator
+#    → Press 'a' for Android Emulator
 ```
 
-This checks structure, boots the kernel, runs the CLI test suite, and verifies that the admin bridge points at the canonical kernel.
+---
 
-## Browser runtime
+## API Key Setup
 
-Open:
+1. Launch the app
+2. Tap the **Agent** tab → **⚙ Settings**
+3. Enter your Anthropic API key (`sk-ant-api03-…`)
+4. Tap **Save Key** — it's stored in AsyncStorage, never leaves the device except to call `api.anthropic.com`
 
-```txt
-index.html
+> **Note:** For production distribution, proxy the API through your own backend instead of bundling the key.
+
+---
+
+## Features
+
+| Tab | What it does |
+|-----|-------------|
+| ⚡ Builder | Prompt → AI generates HTML app/game/agent. Preview in WebView, view/copy code, or paste your own code to run. Refine via chat. |
+| 🖼 Gallery | Browsable grid of all generated items. Live WebView thumbnails. Tap to see full preview or copy code. |
+| 📁 Files | Pick any file. ZIPs are fully extracted with fflate. HTML files inside ZIPs can be sent directly to the Builder to run. AI can analyze any file. |
+| 🤖 Agent | Add goals, trigger evolution cycles (AI plans GNN improvements), view learning history. GNN persists via AsyncStorage. |
+
+---
+
+## Architecture
+
+```
+App.js                        ← Root: state + tab routing
+src/
+  api/claude.js               ← Anthropic API (direct, no CORS in RN)
+  engine/TridentGNN.js        ← GNN: nodes, edges, weights, AsyncStorage
+  components/
+    BottomNav.js              ← Thumb-friendly tab bar with safe area
+    GNNPanel.js               ← Live stats chip row
+  screens/
+    BuilderScreen.js          ← Generate | Preview | Code | Paste + Chat
+    GalleryScreen.js          ← FlatList grid + detail modal
+    FilesScreen.js            ← expo-document-picker + fflate ZIP extraction
+    AgentScreen.js            ← Goals + Evolution + Settings
 ```
 
-## Node CLI / kernel
+---
+
+## Key Dependencies
+
+| Package | Why |
+|---------|-----|
+| `react-native-webview` | Renders generated HTML (replaces iframes) |
+| `expo-document-picker` | Native file picker (any type, including ZIPs) |
+| `expo-file-system` | Reads picked files as base64 for ZIP extraction |
+| `fflate` | Pure-JS ZIP extraction — works in React Native |
+| `expo-clipboard` | Copy code to clipboard |
+| `@react-native-async-storage/async-storage` | GNN persistence across sessions |
+| `react-native-safe-area-context` | Handles notch / home indicator |
+
+---
+
+## Building for Production
 
 ```bash
-npm run init
-npm run test
-npm run cli:pipeline
-npm run kernel:boot
+# EAS Build (recommended)
+npm install -g eas-cli
+eas build --platform ios      # or android
+eas submit                    # App Store / Play Store
 ```
 
-## Admin bridge
-
-```bash
-npm run admin:install
-npm run admin:check
-npm run admin:start
-```
-
-Then open:
-
-```txt
-http://localhost:8787/admin/morph
-```
-
-## Expo app
-
-```bash
-npm run expo:install
-npm run expo:start
-```
-
-The Expo app is intentionally a separate mobile client. It does not pretend to be the browser runtime or Node kernel.
-
-## Architecture lock
-
-Kernel files live in `kernel/` only. Root files are shims for command convenience. The admin bridge imports the canonical kernel instead of carrying a private fork. Runtime memory defaults to `memory/` at repo root and can be overridden with `MORPH_MEMORY_DIR`.
+For production: move the Anthropic API call to your own backend and pass requests through it. Do not ship the raw API key in the app bundle.

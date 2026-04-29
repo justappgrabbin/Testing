@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Trident",
+    "slug": "trident-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#080810",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "backgroundColor": "#080810"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.trident.selfbuilding"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#080810"
+      },
+      "package": "com.trident.selfbuilding"
+    },
+    "plugins": [
+      "expo-document-picker"
+    ]
+  }
+}
